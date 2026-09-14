@@ -1,26 +1,311 @@
 @import "tailwindcss";
 
+/* ============================================================
+   EDIFY DESIGN SYSTEM — "Golden Hour Twilight"
+   A serene, therapeutic, immersive design language
+   ============================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Sky Gradient Palette (Zenith to Horizon) */
+  --sky-zenith: #1A162B;
+  --sky-dusk-purple: #3E2C5B;
+  --sky-sunset-rose: #8C4B6E;
+  --sky-coral-glow: #D97359;
+  --sky-golden-hour: #F4A261;
+  --sky-sun-zenith: #FDE68A;
+
+  /* Cloud Card Glassmorphism */
+  --cloud-surface-light: rgba(255, 250, 240, 0.12);
+  --cloud-surface-dusk: rgba(38, 30, 56, 0.60);
+  --cloud-border-gold: rgba(253, 230, 138, 0.3);
+  --cloud-glow: rgba(244, 162, 97, 0.22);
+
+  /* Text Colors */
+  --text-primary: #FFFDF9;
+  --text-secondary: #E2D9F3;
+  --text-dark: #1C152B;
+
+  /* Accent Colors */
+  --accent-harmony-up: #86EFAC;
+  --accent-drift: #FBBF24;
+  --accent-calm-blue: #93C5FD;
+
+  /* Background */
+  --background: #1A162B;
+  --foreground: #FFFDF9;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  /* Sky colors */
+  --color-sky-zenith: #1A162B;
+  --color-sky-dusk: #3E2C5B;
+  --color-sky-rose: #8C4B6E;
+  --color-sky-coral: #D97359;
+  --color-sky-golden: #F4A261;
+  --color-sky-sun: #FDE68A;
+
+  /* Semantic colors */
+  --color-text-primary: #FFFDF9;
+  --color-text-secondary: #E2D9F3;
+  --color-accent-up: #86EFAC;
+  --color-accent-drift: #FBBF24;
+  --color-accent-blue: #93C5FD;
+
+  /* Fonts */
+  --font-serif: var(--font-fraunces);
+  --font-sans: var(--font-jakarta);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--sky-zenith);
+  color: var(--text-primary);
+}
+
+/* ============================================================
+   GLASSMORPHISM UTILITIES
+   ============================================================ */
+
+.glass-panel {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 240, 225, 0.06) 100%
+  );
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid rgba(255, 235, 200, 0.2);
+  box-shadow:
+    0 20px 45px -10px rgba(26, 22, 43, 0.4),
+    0 0 30px 2px rgba(244, 162, 97, 0.12),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+.glass-panel-dense {
+  background: rgba(26, 22, 43, 0.65);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid rgba(255, 235, 200, 0.15);
+}
+
+/* ============================================================
+   CLOUD CARD STYLES
+   ============================================================ */
+
+.cloud-card {
+  position: relative;
+  padding: 1.5rem 2rem;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(255, 240, 225, 0.08) 100%
+  );
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border-radius: 64% 36% 48% 52% / 45% 55% 45% 55%;
+  border: 1px solid rgba(255, 235, 200, 0.35);
+  box-shadow:
+    0 25px 50px -12px rgba(26, 22, 43, 0.5),
+    0 0 35px 2px rgba(244, 162, 97, 0.22),
+    inset 0 2px 4px rgba(255, 255, 255, 0.5),
+    inset 0 -4px 12px rgba(140, 75, 110, 0.2);
+  color: var(--text-primary);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, border-radius, box-shadow;
+  cursor: pointer;
+}
+
+.cloud-card:hover {
+  transform: translateY(-8px) scale(1.03);
+  border-radius: 52% 48% 62% 38% / 55% 45% 55% 45%;
+  box-shadow:
+    0 35px 60px -10px rgba(26, 22, 43, 0.6),
+    0 0 50px 8px rgba(253, 230, 138, 0.35),
+    inset 0 2px 6px rgba(255, 255, 255, 0.7);
+  border-color: rgba(253, 230, 138, 0.6);
+}
+
+.cloud-card-selected {
+  border-radius: 52% 48% 62% 38% / 55% 45% 55% 45%;
+  box-shadow:
+    0 35px 60px -10px rgba(26, 22, 43, 0.6),
+    0 0 60px 12px rgba(253, 230, 138, 0.4),
+    inset 0 2px 6px rgba(255, 255, 255, 0.7);
+  border-color: rgba(253, 230, 138, 0.7);
+}
+
+/* ============================================================
+   TICKER ANIMATION
+   ============================================================ */
+
+@keyframes ticker-scroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.ticker-track {
+  display: flex;
+  gap: 3rem;
+  animation: ticker-scroll 320s linear infinite;
+  white-space: nowrap;
+}
+
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+/* ============================================================
+   GOLDEN GLOW BUTTON
+   ============================================================ */
+
+.btn-golden {
+  background: linear-gradient(135deg, #F4A261, #FDE68A);
+  color: #1C152B;
+  border: none;
+  border-radius: 9999px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 20px rgba(244, 162, 97, 0.4);
+}
+
+.btn-golden:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(253, 230, 138, 0.5);
+}
+
+/* ============================================================
+   ANTE BUTTON
+   ============================================================ */
+
+.ante-btn {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.875rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(253, 230, 138, 0.3);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ante-btn:hover {
+  background: linear-gradient(135deg, rgba(244, 162, 97, 0.4), rgba(253, 230, 138, 0.4));
+  border-color: rgba(253, 230, 138, 0.7);
+  box-shadow: 0 0 20px rgba(253, 230, 138, 0.4);
+  transform: scale(1.1);
+}
+
+.ante-btn:active {
+  transform: scale(0.95);
+}
+
+/* ============================================================
+   SLIDE ANIMATIONS
+   ============================================================ */
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0%);
+  }
+}
+
+@keyframes slide-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes float-gentle {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(253, 230, 138, 0.3); }
+  50% { box-shadow: 0 0 35px rgba(253, 230, 138, 0.5); }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-in-up {
+  animation: slide-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out forwards;
+}
+
+.animate-float {
+  animation: float-gentle 4s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+/* ============================================================
+   TEXT UTILITIES
+   ============================================================ */
+
+.text-shadow-sky {
+  text-shadow: 0 2px 12px rgba(26, 22, 43, 0.6), 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* ============================================================
+   SCROLLBAR STYLING
+   ============================================================ */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(26, 22, 43, 0.3);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(244, 162, 97, 0.4);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(244, 162, 97, 0.6);
 }

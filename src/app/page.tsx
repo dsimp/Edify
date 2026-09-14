@@ -1,69 +1,107 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+import dynamic from "next/dynamic";
+import ResonanceTicker from "@/components/ui/ResonanceTicker";
+import CategoryLensBar from "@/components/ui/CategoryLensBar";
+import CelestialBreadcrumb from "@/components/ui/CelestialBreadcrumb";
+import AntePanel from "@/components/ui/AntePanel";
+import WalletBadge from "@/components/ui/WalletBadge";
+import ModeToggle from "@/components/ui/ModeToggle";
+import StatementComposer from "@/components/ui/StatementComposer";
+import CreatorEarningsDrawer from "@/components/ui/CreatorEarningsDrawer";
+import TwilightListView from "@/components/ui/TwilightListView";
+
+/**
+ * Dynamically import the 3D Sky Canvas with SSR disabled for 3D Globe Orbit.
+ */
+const SkyCanvas = dynamic(() => import("@/components/sky/SkyCanvas"), {
+  ssr: false,
+  loading: () => (
+    <div className="fixed inset-0 bg-[#130F24] flex items-center justify-center z-0">
+      <div className="text-center animate-fade-in">
+        <div className="text-6xl mb-4 animate-pulse">🌅</div>
+        <h1
+          className="text-3xl font-light tracking-wide mb-2"
+          style={{ fontFamily: "var(--font-fraunces), serif", color: "#FDE68A" }}
+        >
+          Edify
+        </h1>
+        <p
+          className="text-xs tracking-widest uppercase text-[#E2D9F3]/80"
+          style={{ fontFamily: "var(--font-jakarta), sans-serif" }}
+        >
+          Entering the World Sky of Wisdom & Truths...
+        </p>
+        <div className="mt-6 w-48 h-1 mx-auto rounded-full overflow-hidden bg-[#241738]">
+          <div
+            className="h-full rounded-full"
+            style={{
+              background: "linear-gradient(90deg, #F4A261, #FDE68A)",
+              animation: "loading-bar 2s ease-in-out infinite",
+            }}
+          />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      </div>
+      <style>{`
+        @keyframes loading-bar {
+          0% { width: 0%; }
+          50% { width: 80%; }
+          100% { width: 100%; }
+        }
+      `}</style>
     </div>
+  ),
+});
+
+export default function HomePage() {
+  return (
+    <main className="relative w-screen h-screen overflow-hidden select-none">
+      {/* === 1. 3D Living Stage (Flight through clouds in local city / Orbit in cosmic galaxy) === */}
+      <SkyCanvas />
+
+      {/* === 2D Serene Reading Mode (When toggled) === */}
+      <TwilightListView />
+
+      {/* === HUD Overlay Layer === */}
+      <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 10 }}>
+        {/* Top Header: Live Resonance Ticker (at the very top) */}
+        <div className="fixed top-0 left-0 w-full pointer-events-auto">
+          <ResonanceTicker />
+        </div>
+
+        {/* Top Controls Row (Responsive Flex Row) */}
+        <div className="fixed top-9 left-0 w-full px-3 sm:px-6 flex items-center justify-between pointer-events-none">
+          <div className="pointer-events-auto">
+            <CategoryLensBar />
+          </div>
+
+          <div className="flex items-center gap-1.5 pointer-events-auto">
+            <WalletBadge />
+            <ModeToggle />
+          </div>
+        </div>
+
+        {/* Bottom-Center: Geographic Sky & 3D Globe Orbit Navigator */}
+        <div className="fixed bottom-5 left-1/2 -translate-x-1/2 pointer-events-auto">
+          <CelestialBreadcrumb />
+        </div>
+
+        {/* Mobile Responsive Bottom-Sheet / Right Panel: Ante Interaction */}
+        <div className="pointer-events-auto">
+          <AntePanel />
+        </div>
+
+        {/* Bottom-Right: Create Statement FAB */}
+        <div className="pointer-events-auto">
+          <StatementComposer />
+        </div>
+
+        {/* Creator Income & Payout Modal */}
+        <div className="pointer-events-auto">
+          <CreatorEarningsDrawer />
+        </div>
+      </div>
+    </main>
   );
 }
+

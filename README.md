@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🌌 Edify — The Luminous Nexus of Human Wisdom & Truths
 
-## Getting Started
+> *"If it shouts, counts, or clutters the sky, it does not belong on the main stage. Resonance is a glow, not a scoreboard. The world is the interface."*
 
-First, run the development server:
+Edify is a spatial, therapeutic web platform that presents world reflections, citizen dispatches, scientific breakthroughs, and deep human wisdom as weightless **Prismatic Obsidian Monoliths** suspended in a living 3D cosmic observatory.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ✨ Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **🪐 3D Bioluminescent Obsidian Earth (Orbit Mode)**:
+  - High-precision continent textures, bioluminescent cyan coastal shelves, and night city light constellations.
+  - Seamless toggle between planetary orbit and local flight horizons.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **💎 Prismatic Obsidian Crystal Monoliths (Flight Mode)**:
+  - Frosted obsidian glass monoliths with `backdrop-filter: blur(32px) saturate(190%)` and delicate specular rim glows.
+  - Ethereal breathing auroral starlight halos (warm amber, celestial cyan, emerald, and rose).
+  - Editorial Fraunces serif typography with zero financial/metric clutter on the main stage.
 
-## Learn More
+- **🎲 3D Rotatable Evidence Cube**:
+  - Attached supporting materials (high-res images, video footage, and verified research links) rendered on the 6 sides of an interactive, weightless 3D spatial cube.
+  - 360° touch/mouse rotation, smooth zero-gravity auto-spin, and 1-click fullscreen lightbox & video playback.
 
-To learn more about Next.js, take a look at the following resources:
+- **🧲 Magnetic Soft-Snap Centering & Spacious Celestial Corridor**:
+  - Thoughts spaced along an alternating 3D S-curve with generous Z-depth (~26 units).
+  - Smooth magnetic easing automatically centers thoughts in front of the viewer upon approach.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **📋 Twilight Journal (Accessible List Mode)**:
+  - Minimalist reading view with category lens filters and search.
+  - Seamless 1-click flight directly from list cards into the 3D celestial sky.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **🕊️ Micro-Support & Sanctuary**:
+  - Simple 1¢–5¢ micro-empowerment with daily quota limits.
+  - Private creator earnings ledger and payout request portal.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🛠️ Tech Stack
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Framework**: [Next.js](https://nextjs.org/) (App Router, Turbopack)
+- **3D & WebGL**: [Three.js](https://threejs.org/), [React Three Fiber](https://r3f.docs.pmnd.rs/), [@react-three/drei](https://github.com/pmndrs/drei), [@react-three/postprocessing](https://github.com/pmndrs/react-postprocessing)
+- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Typography**: [Fraunces](https://fonts.google.com/specimen/Fraunces), [Plus Jakarta Sans](https://fonts.google.com/specimen/Plus+Jakarta+Sans)
+- **Audio Synthesis**: Web Audio API Procedural Harmonic Chimes (432Hz, 528Hz Solfeggio frequencies)
+
+---
+
+## 🚀 Getting Started
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/dsimp/Edify.git
+   cd Edify
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server**:
+   ```bash
+   npm run dev
+   ```
+
+4. Open [http://localhost:3000](http://localhost:3000) in your browser to enter the World Sky.
