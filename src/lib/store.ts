@@ -1,297 +1,261 @@
-import { create } from 'zustand';
-import { Statement, TickerItem, GeoFilter, UserWallet, StatementCategory } from './types';
-import { mockStatements, mockTickerItems, mockUserWallet } from './mock-data';
-import { globalLocations, GeoLocationItem } from './geo-presets';
-import { TimeOfDay } from './time-engine';
-import { soundEngine } from './sound-engine';
-import { getStatementSpatialPosition } from './spatial-corridor';
+import { create } from "zustand";
+import type { EarningEvent, MediaAttachment, Payout, Statement, StatementKind, SupportEvent, Wallet } from "./types";
+import { SAMPLE_STATEMENTS } from "./sample-data";
+import { ECONOMICS, checkSupport, earningsSummary, splitSupport, type SupportCheck } from "./economics";
+import { sound } from "./sound";
 
-interface EdifyState {
-  statements: Statement[];
-  tickerItems: TickerItem[];
-  geoFilter: GeoFilter;
-  activeLocation: GeoLocationItem;
-  timeOfDayOverride: TimeOfDay | null;
-  isGlobeView: boolean;
-  isSwooping: boolean;
-  activeCategory: StatementCategory;
-  userWallet: UserWallet;
-  selectedStatementId: string | null;
-  cameraTarget: { x: number; y: number; z: number } | null;
-  isFlightMode: boolean;
-  isSoundEnabled: boolean;
-  isEarningsModalOpen: boolean;
-  recentAnteAnimation: { statementId: string; amountCents: number; timestamp: number } | null;
+export const ME = { id: "me", name: "You" } as const;
 
-  // Actions
-  anteStatement: (statementId: string, amountCents: number) => void;
-  setGeoFilter: (filter: GeoFilter) => void;
-  setActiveLocation: (loc: GeoLocationItem) => void;
-  swoopToLocation: (loc: GeoLocationItem) => void;
-  setTimeOfDayOverride: (time: TimeOfDay | null) => void;
-  setGlobeView: (isGlobe: boolean) => void;
-  toggleGlobeView: () => void;
-  setActiveCategory: (category: StatementCategory) => void;
-  selectStatement: (id: string | null) => void;
-  flyToStatement: (id: string) => void;
-  toggleFlightMode: () => void;
-  toggleSound: () => void;
-  setEarningsModalOpen: (isOpen: boolean) => void;
-  requestPayout: (amountCents: number) => { success: boolean; message: string };
-  addStatement: (payload: { text: string; location: string; category: StatementCategory; sourceUrl?: string; mediaAttachments?: MediaAttachment[] }) => void;
+export type SortMode = "top" | "rising" | "new";
+export type PlaceSelection = string | null;
+
+export interface Toast {
+  id: number;
+  text: string;
+  tone: "info" | "success" | "error";
+  undoSupportId?: string;
 }
 
-export const useEdifyStore = create<EdifyState>((set, get) => ({
-  statements: mockStatements,
-  tickerItems: mockTickerItems,
-  geoFilter: {
-    level: 'world',
-    path: ['World Horizon'],
-    activeNode: null,
-  },
-  activeLocation: globalLocations[0], // Global Horizon
-  timeOfDayOverride: null, // null = Live Solar Time
-  isGlobeView: false,
-  isSwooping: false,
-  activeCategory: 'all',
-  userWallet: mockUserWallet,
-  selectedStatementId: null,
-  cameraTarget: null,
-  isFlightMode: true,
-  isSoundEnabled: false,
-  isEarningsModalOpen: false,
-  recentAnteAnimation: null,
+export interface PublishInput {
+  kind: StatementKind;
+  text: string;
+  media: MediaAttachment[];
+  placeId: string;
+}
 
-  setTimeOfDayOverride: (time) => {
-    soundEngine.playChime(time === "night" ? 396 : time === "dawn" ? 528 : 432, 1.8);
-    set({ timeOfDayOverride: time });
-  },
+interface State {
+  statements: Statement[];
+  wallet: Wallet;
+  ledger: SupportEvent[];
+  earnings: EarningEvent[];
+  payouts: Payout[];
 
-  setActiveLocation: (loc) => {
-    soundEngine.playChime(loc.atmosphere.soundDroneFreq || 480, 2.5);
-    set({
-      activeLocation: loc,
-      isGlobeView: false,
-      isSwooping: false,
-      selectedStatementId: null,
-      geoFilter: {
-        level: loc.continent === 'Global' ? 'world' : 'city',
-        path: loc.continent === 'Global' ? ['World Horizon'] : [loc.continent, loc.country, loc.name],
-        activeNode: {
-          id: loc.id,
-          name: loc.name,
-          nodeType: loc.continent === 'Global' ? 'continent' : 'city',
-          parentId: null,
-          path: `World.${loc.continent}.${loc.name}`,
-        },
-      },
-    });
-  },
+  selectedPlaceId: PlaceSelection;
+  openStatementId: string | null;
+  kindFilter: StatementKind | "all";
+  sort: SortMode;
+  composerOpen: boolean;
+  walletOpen: boolean;
+  soundOn: boolean;
+  toast: Toast | null;
 
-  swoopToLocation: (loc) => {
-    soundEngine.playChime(528, 3.0);
-    set({ isSwooping: true });
+  selectPlace: (id: PlaceSelection) => void;
+  openStatement: (id: string | null) => void;
+  setKindFilter: (k: StatementKind | "all") => void;
+  setSort: (s: SortMode) => void;
+  setComposerOpen: (open: boolean) => void;
+  setWalletOpen: (open: boolean) => void;
+  toggleSound: () => void;
+  showToast: (t: Omit<Toast, "id">) => void;
+  dismissToast: () => void;
 
-    // After camera swoops down through atmosphere (1.6s), activate local sky setting
-    setTimeout(() => {
-      set({
-        activeLocation: loc,
-        isGlobeView: false,
-        isSwooping: false,
-        selectedStatementId: null,
-        geoFilter: {
-          level: loc.continent === 'Global' ? 'world' : 'city',
-          path: loc.continent === 'Global' ? ['World Horizon'] : [loc.continent, loc.country, loc.name],
-          activeNode: {
-            id: loc.id,
-            name: loc.name,
-            nodeType: loc.continent === 'Global' ? 'continent' : 'city',
-            parentId: null,
-            path: `World.${loc.continent}.${loc.name}`,
-          },
-        },
-      });
-    }, 1600);
-  },
+  support: (statementId: string, cents: number) => SupportCheck;
+  undoSupport: (supportId: string) => void;
+  publish: (input: PublishInput) => string;
+  topUp: (cents: number) => void;
+  withdraw: () => { ok: boolean; message: string };
+}
 
-  setGlobeView: (isGlobe) => {
-    soundEngine.playChime(432, 2.0);
-    set({ isGlobeView: isGlobe, isSwooping: false, selectedStatementId: null });
-  },
+const DAY = 86_400_000;
+const NOW = Date.now();
 
-  toggleGlobeView: () => {
-    const nextState = !get().isGlobeView;
-    soundEngine.playChime(nextState ? 432 : 528, 2.0);
-    set({ isGlobeView: nextState, isSwooping: false, selectedStatementId: null });
-  },
+const MY_STATEMENT: Statement = {
+  id: "st-me-0",
+  authorId: ME.id,
+  authorName: ME.name,
+  kind: "thought",
+  text: "We don't need everyone to agree. We need everyone to be heard — and then let the world decide what's worth backing.",
+  media: [],
+  placeId: "chicago",
+  createdAt: NOW - 12 * DAY,
+  totalCents: 2256,
+  supporters: 1031,
+  supports: 1240,
+  sqrtSum: 1031 * Math.sqrt(2.19),
+};
 
-  anteStatement: (statementId, amountCents) => {
-    if (amountCents < 1 || amountCents > 5) return;
-    
-    set((state) => {
-      if (state.userWallet.availableBalanceCents < amountCents) {
-        return state;
-      }
-      
-      // Trigger harmonious sound chime
-      soundEngine.playAnteSpark(amountCents);
+const SEED_EARNINGS: EarningEvent[] = [
+  { id: "e1", statementId: MY_STATEMENT.id, ticks: 98_000, at: NOW - 11 * DAY },
+  { id: "e2", statementId: MY_STATEMENT.id, ticks: 50_500, at: NOW - 9 * DAY },
+  { id: "e3", statementId: MY_STATEMENT.id, ticks: 21_400, at: NOW - 3 * DAY },
+  { id: "e4", statementId: MY_STATEMENT.id, ticks: 10_580, at: NOW - 1 * DAY },
+];
 
-      // Deduct from user wallet
-      const newWallet = {
-        ...state.userWallet,
-        availableBalanceCents: state.userWallet.availableBalanceCents - amountCents
-      };
+let toastSeq = 1;
+let idSeq = 1;
+const uid = (p: string) => `${p}-${Date.now().toString(36)}-${(idSeq++).toString(36)}`;
 
-      // 80% to creator pending balance, 20% platform share
-      const creatorShareCents = Math.round(amountCents * 0.8);
-
-      const newStatements = state.statements.map(stmt => {
-        if (stmt.id === statementId) {
-          return {
-            ...stmt,
-            totalAnteCents: stmt.totalAnteCents + amountCents,
-            totalAntesCount: stmt.totalAntesCount + 1,
-            uniqueSupportersCount: stmt.uniqueSupportersCount + 1,
-            velocityScore: Math.min(100, stmt.velocityScore + amountCents * 3)
-          };
-        }
-        return stmt;
-      });
-
-      return {
-        userWallet: newWallet,
-        statements: newStatements,
-        recentAnteAnimation: {
-          statementId,
-          amountCents,
-          timestamp: Date.now()
-        }
-      };
-    });
-  },
-
-  setGeoFilter: (filter) => {
-    soundEngine.playChime(480, 1.8);
-    set({ geoFilter: filter });
-  },
-
-  setActiveCategory: (category) => {
-    soundEngine.playChime(540, 1.8);
-    set({ activeCategory: category });
-  },
-  
-  selectStatement: (id) => {
-    if (id) {
-      soundEngine.playChime(528, 2.5); // 528Hz DNA repair / transformation frequency
-    }
-    set({ selectedStatementId: id });
-  },
-  
-  flyToStatement: (id) => {
-    const state = get();
-    const sorted = [...state.statements]
-      .filter((s) => s.moderationStatus === "approved")
-      .filter((s) => state.activeCategory === "all" || s.category === state.activeCategory)
-      .sort((a, b) => b.uniqueSupportersCount - a.uniqueSupportersCount);
-
-    const index = sorted.findIndex((s) => s.id === id);
-    const pos = index >= 0 ? getStatementSpatialPosition(index) : null;
-
-    soundEngine.playChime(648, 3.0);
-    set({ 
-      selectedStatementId: id,
-      isFlightMode: true,
-      isGlobeView: false,
-      cameraTarget: pos ? { x: pos.x, y: pos.y, z: pos.z } : null,
-    });
-  },
-  
-  toggleFlightMode: () => {
-    soundEngine.playChime(432, 1.5);
-    set((state) => ({ isFlightMode: !state.isFlightMode }));
-  },
-  
-  toggleSound: () => {
-    const isMuted = soundEngine.toggleMute();
-    set({ isSoundEnabled: !isMuted });
-  },
-
-  setEarningsModalOpen: (isOpen) => {
-    if (isOpen) soundEngine.playChime(540, 2.0);
-    set({ isEarningsModalOpen: isOpen });
-  },
-
-  requestPayout: (amountCents) => {
-    const state = get();
-    // Rule: $50 minimum threshold (5000 cents)
-    if (state.userWallet.withdrawableCents < 5000) {
-      return {
-        success: false,
-        message: 'Minimum payout threshold is $50.00. Keep sharing inspiring thoughts to reach your milestone!'
-      };
-    }
-
-    if (amountCents > state.userWallet.withdrawableCents) {
-      return {
-        success: false,
-        message: 'Amount exceeds your available withdrawable balance.'
-      };
-    }
-
-    set({
-      userWallet: {
-        ...state.userWallet,
-        withdrawableCents: state.userWallet.withdrawableCents - amountCents,
-        pendingPayoutCents: state.userWallet.pendingPayoutCents + amountCents,
-      }
-    });
-
-    soundEngine.playChime(720, 3.5);
+export const useStore = create<State>((set, get) => {
+  const applyToStatement = (s: Statement, userTotalBefore: number, cents: number, sign: 1 | -1): Statement => {
+    const before = userTotalBefore;
+    const after = before + sign * cents;
     return {
-      success: true,
-      message: `Payout of $${(amountCents / 100).toFixed(2)} initiated to your linked account. Platform fee (20%) deducted at time of ante reception.`
+      ...s,
+      totalCents: s.totalCents + sign * cents,
+      supports: s.supports + sign,
+      supporters: s.supporters + (sign === 1 && before === 0 ? 1 : sign === -1 && after === 0 ? -1 : 0),
+      sqrtSum: s.sqrtSum + Math.sqrt(after) - Math.sqrt(before),
     };
-  },
-  
-  addStatement: (payload) => {
-    set((state) => {
-      soundEngine.playChime(648, 3.2);
-      const newStmt: Statement = {
-        id: `stmt-new-${Date.now()}`,
-        authorId: 'user-123',
-        authorName: 'You (Citizen Voice)',
-        isCitizenReporter: true,
-        category: (payload.category === 'all' ? 'news' : payload.category) as any,
-        content: payload.text,
-        sourceUrl: payload.sourceUrl,
-        mediaAttachments: payload.mediaAttachments || [],
-        languageCode: 'en',
-        geoNodeId: payload.location,
-        geoPath: `World.Local.${payload.location}`,
-        cityName: payload.location,
-        countryCode: 'US',
-        countryName: 'United States',
-        regionName: 'Local',
-        latitude: 0,
-        longitude: 0,
-        totalAnteCents: 0,
-        uniqueSupportersCount: 0,
-        totalAntesCount: 0,
-        moderationStatus: 'approved' as const,
-        hotScore: 100,
-        velocityScore: 80,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-      
-      return {
-        statements: [newStmt, ...state.statements],
-        userWallet: {
-          ...state.userWallet,
-          statementsCreatedCount: (state.userWallet.statementsCreatedCount || 0) + 1
-        }
-      };
-    });
-  },
-}));
+  };
 
+  const simulateSupporters = (statementId: string) => {
+    let remaining = 6 + Math.floor(Math.random() * 5);
+    const tick = () => {
+      if (remaining-- <= 0) return;
+      const cents = 1 + Math.floor(Math.random() * 5);
+      const { creatorTicks } = splitSupport(cents);
+      set((state) => ({
+        statements: state.statements.map((s) => (s.id === statementId ? applyToStatement(s, 0, cents, 1) : s)),
+        earnings: [...state.earnings, { id: uid("earn"), statementId, ticks: creatorTicks, at: Date.now() }],
+      }));
+      sound.chime(864, 1.2, 0.05);
+      setTimeout(tick, 3500 + Math.random() * 5000);
+    };
+    setTimeout(tick, 4000);
+  };
+
+  return {
+    statements: [MY_STATEMENT, ...SAMPLE_STATEMENTS],
+    wallet: { balanceCents: 2000 },
+    ledger: [],
+    earnings: SEED_EARNINGS,
+    payouts: [],
+
+    selectedPlaceId: null,
+    openStatementId: null,
+    kindFilter: "all",
+    sort: "top",
+    composerOpen: false,
+    walletOpen: false,
+    soundOn: true,
+    toast: null,
+
+    selectPlace: (id) => {
+      if (id) sound.chime(id === "world" ? 432 : 528, 2.4);
+      set({ selectedPlaceId: id, openStatementId: null, kindFilter: "all" });
+    },
+
+    openStatement: (id) => {
+      if (id) sound.chime(648, 2.0);
+      set({ openStatementId: id });
+    },
+
+    setKindFilter: (kindFilter) => set({ kindFilter }),
+    setSort: (sort) => set({ sort }),
+    setComposerOpen: (composerOpen) => set({ composerOpen }),
+    setWalletOpen: (walletOpen) => set({ walletOpen }),
+
+    toggleSound: () => {
+      const next = !get().soundOn;
+      sound.setEnabled(next);
+      set({ soundOn: next });
+    },
+
+    showToast: (t) => set({ toast: { ...t, id: toastSeq++ } }),
+    dismissToast: () => set({ toast: null }),
+
+    support: (statementId, cents) => {
+      const state = get();
+      const statement = state.statements.find((s) => s.id === statementId);
+      if (!statement) return { ok: false, reason: "amount", message: "Unavailable" };
+      const now = Date.now();
+      const check = checkSupport({
+        statement,
+        userId: ME.id,
+        cents,
+        balanceCents: state.wallet.balanceCents,
+        ledger: state.ledger,
+        now,
+      });
+      if (!check.ok) {
+        get().showToast({ text: check.message, tone: "error" });
+        return check;
+      }
+
+      const myTotal = state.ledger
+        .filter((e) => e.statementId === statementId && e.userId === ME.id)
+        .reduce((sum, e) => sum + e.cents, 0);
+      const event: SupportEvent = { id: uid("sup"), statementId, userId: ME.id, cents, at: now };
+
+      sound.support(cents);
+      set({
+        wallet: { balanceCents: state.wallet.balanceCents - cents },
+        ledger: [...state.ledger, event],
+        statements: state.statements.map((s) => (s.id === statementId ? applyToStatement(s, myTotal, cents, 1) : s)),
+        toast: {
+          id: toastSeq++,
+          text: `+${cents}¢ dropped in cup`,
+          tone: "success",
+          undoSupportId: event.id,
+        },
+      });
+      return check;
+    },
+
+    undoSupport: (supportId) => {
+      const state = get();
+      const event = state.ledger.find((e) => e.id === supportId);
+      if (!event || Date.now() - event.at > ECONOMICS.UNDO_MS + 1000) return;
+      const ledger = state.ledger.filter((e) => e.id !== supportId);
+      const myTotalAfterUndo = ledger
+        .filter((e) => e.statementId === event.statementId && e.userId === ME.id)
+        .reduce((sum, e) => sum + e.cents, 0);
+      set({
+        ledger,
+        wallet: { balanceCents: state.wallet.balanceCents + event.cents },
+        statements: state.statements.map((s) =>
+          s.id === event.statementId ? applyToStatement(s, myTotalAfterUndo + event.cents, event.cents, -1) : s,
+        ),
+        toast: { id: toastSeq++, text: "Undone", tone: "info" },
+      });
+    },
+
+    publish: (input) => {
+      const id = uid("st");
+      const statement: Statement = {
+        id,
+        authorId: ME.id,
+        authorName: ME.name,
+        kind: input.kind,
+        text: input.text.trim(),
+        media: input.media.slice(0, 6),
+        placeId: input.placeId,
+        createdAt: Date.now(),
+        totalCents: 0,
+        supporters: 1,
+        supports: 1,
+        sqrtSum: 1,
+      };
+      sound.chime(720, 3);
+      set((state) => ({
+        statements: [statement, ...state.statements],
+        composerOpen: false,
+        selectedPlaceId: input.placeId,
+        openStatementId: id,
+        toast: { id: toastSeq++, text: "Voiced", tone: "success" },
+      }));
+      simulateSupporters(id);
+      return id;
+    },
+
+    topUp: (cents) => {
+      sound.chime(540, 2);
+      set((state) => ({
+        wallet: { balanceCents: state.wallet.balanceCents + cents },
+      }));
+    },
+
+    withdraw: () => {
+      const state = get();
+      const { available } = earningsSummary(state.earnings, state.payouts, Date.now());
+      const minTicks = ECONOMICS.MIN_PAYOUT_CENTS * 100;
+      if (available < minTicks) {
+        return { ok: false, message: "Minimum payout not yet reached." };
+      }
+      const ticks = Math.floor(available / 100) * 100;
+      sound.chime(864, 3);
+      set({ payouts: [...state.payouts, { id: uid("po"), ticks, at: Date.now() }] });
+      return { ok: true, message: "Transfer initiated." };
+    },
+  };
+});

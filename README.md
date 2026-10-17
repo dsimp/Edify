@@ -1,67 +1,43 @@
-# 🌌 Edify — The Luminous Nexus of Human Wisdom & Truths
+# ⬡ Perspectives — Worldwide Truth, Real Conviction & 3D Crystal Evidence
 
-> *"If it shouts, counts, or clutters the sky, it does not belong on the main stage. Resonance is a glow, not a scoreboard. The world is the interface."*
+> *"No vanity likes. Only human truth, verified evidence, and real conviction."*
 
-Edify is a spatial, therapeutic web platform that presents world reflections, citizen dispatches, scientific breakthroughs, and deep human wisdom as weightless **Prismatic Obsidian Monoliths** suspended in a living 3D cosmic observatory.
-
----
-
-## ✨ Features
-
-- **🪐 3D Bioluminescent Obsidian Earth (Orbit Mode)**:
-  - High-precision continent textures, bioluminescent cyan coastal shelves, and night city light constellations.
-  - Seamless toggle between planetary orbit and local flight horizons.
-
-- **💎 Prismatic Obsidian Crystal Monoliths (Flight Mode)**:
-  - Frosted obsidian glass monoliths with `backdrop-filter: blur(32px) saturate(190%)` and delicate specular rim glows.
-  - Ethereal breathing auroral starlight halos (warm amber, celestial cyan, emerald, and rose).
-  - Editorial Fraunces serif typography with zero financial/metric clutter on the main stage.
-
-- **🎲 3D Rotatable Evidence Cube**:
-  - Attached supporting materials (high-res images, video footage, and verified research links) rendered on the 6 sides of an interactive, weightless 3D spatial cube.
-  - 360° touch/mouse rotation, smooth zero-gravity auto-spin, and 1-click fullscreen lightbox & video playback.
-
-- **🧲 Magnetic Soft-Snap Centering & Spacious Celestial Corridor**:
-  - Thoughts spaced along an alternating 3D S-curve with generous Z-depth (~26 units).
-  - Smooth magnetic easing automatically centers thoughts in front of the viewer upon approach.
-
-- **📋 Twilight Journal (Accessible List Mode)**:
-  - Minimalist reading view with category lens filters and search.
-  - Seamless 1-click flight directly from list cards into the 3D celestial sky.
-
-- **🕊️ Micro-Support & Sanctuary**:
-  - Simple 1¢–5¢ micro-empowerment with daily quota limits.
-  - Private creator earnings ledger and payout request portal.
+**Perspectives** is a minimalist, futuristic global platform set in a pure white **Construct** observatory. People around the world voice **Facts**, **Opinions**, **Firsthand Experiences**, and **Thoughts** allocated to their city on a living, relief-shaded 3D Earth—backed by real micro-coins (`$0.01–$0.05`) and examined on a slow-spinning **6-sided 3D Crystal Cube**.
 
 ---
 
-## 🛠️ Tech Stack
+## ✨ Key Features
 
-- **Framework**: [Next.js](https://nextjs.org/) (App Router, Turbopack)
-- **3D & WebGL**: [Three.js](https://threejs.org/), [React Three Fiber](https://r3f.docs.pmnd.rs/), [@react-three/drei](https://github.com/pmndrs/drei), [@react-three/postprocessing](https://github.com/pmndrs/react-postprocessing)
-- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **Typography**: [Fraunces](https://fonts.google.com/specimen/Fraunces), [Plus Jakarta Sans](https://fonts.google.com/specimen/Plus+Jakarta+Sans)
-- **Audio Synthesis**: Web Audio API Procedural Harmonic Chimes (432Hz, 528Hz Solfeggio frequencies)
+- **💊 Matrix "Blue Pill or Red Pill" Construct Entrance**:
+  - **Blue Pill**: Step straight into the slowly spinning globe in silent mode.
+  - **Red Pill**: Awaken 432Hz therapeutic sound and inspect the full transparent consensus & payout architecture.
+
+- **🌍 Realistic, Colorful Relief-Shaded 3D Earth**:
+  - Custom GLSL shader combining NASA Blue Marble imagery, SRTM elevation relief, and water masks.
+  - Deep sapphire oceans, turquoise coastal shelves, emerald forests, golden deserts, terracotta & violet mountain ranges, snow-capped peaks, and ocean sun glint on a minimalist white background.
+  - Clickable pins across 23 global city hubs that smoothly zoom the camera into that location's statements.
+
+- **⬡ 6-Sided Slow-Spinning Crystal Evidence Cube**:
+  - Supporting materials (photos, videos, verified links, or local uploads) are projected onto the individual sides of a refractive 3D crystal cube.
+  - Smooth 360° drag rotation, quick face focus (`Side 1`–`Side 6`), and 1-click full-resolution lightbox & video playback.
+
+- **🪙 Real Coins Over "Likes" (`$0.01–$0.05` · `$0.20 / 72h` Cap)**:
+  - Statements are backed by `$0.01`, `$0.02`, `$0.03`, `$0.04`, or `$0.05`.
+  - **Rolling 72-Hour Cap**: A single user can give at most **`$0.20 per 72 hours`** to any single statement so wealth can never buy the narrative.
+  - **Quadratic Consensus Ranking $(\sum \sqrt{c_i})^2$**: 100 people giving 1¢ outranks 5 people giving 20¢—breadth of human agreement always beats depth of pockets.
+
+- **🏦 100% Transparent Creator Income & Payouts**:
+  - **80% Creator / 20% Platform Split** tracked in `1/100¢` ticks (`0.01¢`) so a `1¢` support credits exactly `0.80¢` with zero rounding drift.
+  - **Prepaid Support Bundles (`$5 / $10 / $20`)**: Card processing fees (`2.9% + 30¢`) are paid once on top-up, never on individual `1¢–5¢` supports.
+  - **7-Day Safety Hold & `$10.00` Minimum Withdrawal** to connected bank accounts.
 
 ---
 
 ## 🚀 Getting Started
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/dsimp/Edify.git
-   cd Edify
-   ```
+```bash
+npm install
+npm run dev
+```
 
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
-
-3. **Start the development server**:
-   ```bash
-   npm run dev
-   ```
-
-4. Open [http://localhost:3000](http://localhost:3000) in your browser to enter the World Sky.
+Open [http://localhost:3000](http://localhost:3000) in your browser.

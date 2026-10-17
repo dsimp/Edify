@@ -1,83 +1,79 @@
-export type StatementCategory = 'all' | 'news' | 'philosophy' | 'science' | 'earth' | 'culture';
+/**
+ * Perspectives — core domain types.
+ */
+
+/** What kind of perspective a statement is. Facts must carry supporting material. */
+export type StatementKind = "fact" | "opinion" | "experience" | "thought";
 
 export interface MediaAttachment {
   id: string;
-  type: 'image' | 'video' | 'link';
+  type: "image" | "video" | "link";
   url: string;
   title?: string;
   description?: string;
-  previewUrl?: string;
+  /** Poster frame for videos. */
+  posterUrl?: string;
 }
 
 export interface Statement {
   id: string;
   authorId: string;
   authorName: string;
-  authorAvatar?: string;
-  isCitizenReporter?: boolean;
-  category: 'news' | 'philosophy' | 'science' | 'earth' | 'culture';
-  content: string; // max 1000 chars
-  sourceUrl?: string; // Optional credible reference for news / facts
-  mediaAttachments?: MediaAttachment[]; // Attached images, videos, or verified research links
-  languageCode: string;
-  geoNodeId: string;
-  geoPath: string; // e.g. 'World.Americas.USA.CA.SanFrancisco'
-  cityName?: string;
-  stateName?: string;
-  countryCode: string;
-  countryName: string;
-  regionName: string;
-  latitude: number;
-  longitude: number;
-  totalAnteCents: number;
-  uniqueSupportersCount: number;
-  totalAntesCount: number;
-  moderationStatus: 'pending' | 'approved' | 'quarantined' | 'removed';
-  hotScore: number;
-  velocityScore: number;
-  createdAt: Date;
-  updatedAt: Date;
+  kind: StatementKind;
+  text: string;
+  /** Up to 6 supporting materials — one per crystal cube face. */
+  media: MediaAttachment[];
+  /** The place this statement is allocated to (see places.ts). */
+  placeId: string;
+  createdAt: number; // epoch ms
+
+  /** Public, transparent support totals. */
+  totalCents: number;
+  supporters: number;
+  supports: number;
+  /**
+   * Σ √(cents given by each supporter). Used for "consensus" ranking:
+   * (Σ√c)² rewards many people agreeing over a few people paying a lot.
+   */
+  sqrtSum: number;
 }
 
-export interface Ante {
+/** A single support action (stored in the ledger for the 72h cap). */
+export interface SupportEvent {
   id: string;
   statementId: string;
   userId: string;
-  amountCents: number; // 1-5
-  createdAt: Date;
+  cents: number;
+  at: number; // epoch ms
 }
 
-export interface UserWallet {
-  userId: string;
-  availableBalanceCents: number;
-  pendingPayoutCents: number;
-  withdrawableCents: number;
-  lifetimeEarnedCents: number;
-  statementsCreatedCount: number;
+/** Spending balance (whole cents) — funded by card top-ups. */
+export interface Wallet {
+  balanceCents: number;
 }
 
-export interface GeoNode {
+/**
+ * Creator earnings are tracked in "ticks" (1 tick = 1/100 of a cent) so an 80%
+ * share of a 1¢ support (0.8¢) is stored exactly with no rounding drift.
+ * Pending vs. available is derived from `at` + the hold period.
+ */
+export interface EarningEvent {
+  id: string;
+  statementId: string;
+  ticks: number;
+  at: number;
+}
+
+export interface Payout {
+  id: string;
+  ticks: number;
+  at: number;
+}
+
+export interface Place {
   id: string;
   name: string;
-  nodeType: 'continent' | 'region' | 'country' | 'state' | 'city';
-  parentId: string | null;
-  path: string;
-  isoCode?: string;
+  country: string;
+  lat: number;
+  lng: number;
 }
-
-export interface TickerItem {
-  statementId: string;
-  category?: 'news' | 'philosophy' | 'science' | 'earth' | 'culture';
-  content: string; // truncated
-  resonantMinds: number; // unique supporters
-  harmonyIndex: number; // % change in last hour
-  driftVelocity: string; // e.g. 'Rising in Tokyo'
-  trend: 'up' | 'stable' | 'reflective';
-}
-
-export interface GeoFilter {
-  level: 'world' | 'region' | 'country' | 'state' | 'city';
-  path: string[];
-  activeNode: GeoNode | null;
-}
-
